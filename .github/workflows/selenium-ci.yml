@@ -23,7 +23,6 @@ jobs:
           cache: maven
 
       - name: Run tests
-        working-directory: SeleniumFramework
         run: mvn clean test -Dbrowser=chrome
 
       - name: Upload results
