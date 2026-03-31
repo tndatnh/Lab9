@@ -2,71 +2,76 @@ package framework.utils;
 
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ExcelReader {
-
+    
     /**
-     * Đọc toàn bộ data từ một sheet Excel.
-     * Dòng đầu tiên (index 0) là header — bị bỏ qua.
-     * Trả về Object[][] để dùng với @DataProvider.
+     * Đọc dữ liệu từ file Excel và trả về mảng 2 chiều cho TestNG DataProvider
+     * @param filePath Đường dẫn file Excel
+     * @param sheetName Tên sheet cần đọc
+     * @return Object[][] với mỗi row chứa [username, password, expected, description]
      */
     public static Object[][] getData(String filePath, String sheetName) {
+        List<Object[]> dataList = new ArrayList<>();
+        
         try (FileInputStream fis = new FileInputStream(filePath);
              Workbook workbook = new XSSFWorkbook(fis)) {
-
+            
             Sheet sheet = workbook.getSheet(sheetName);
-
-            // Kiểm tra sheet có tồn tại không
             if (sheet == null) {
-                throw new RuntimeException("❌ Không tìm thấy sheet: " + sheetName
-                        + " trong file: " + filePath);
+                System.err.println("Sheet '" + sheetName + "' không tồn tại trong file: " + filePath);
+                return new Object[0][4]; // Trả về mảng rỗng với 4 cột
             }
-
-            int lastRow = sheet.getLastRowNum();       // Dòng cuối cùng có data
-            int lastCol = sheet.getRow(0).getLastCellNum(); // Số cột (đọc từ header)
-
-            // lastRow dòng data (bỏ dòng 0 là header)
-            Object[][] data = new Object[lastRow][lastCol];
-
-            for (int r = 1; r <= lastRow; r++) { // Bắt đầu từ dòng 1: bỏ header
-                Row row = sheet.getRow(r);
-                if (row == null) continue; // Bỏ qua dòng trống
-
-                for (int c = 0; c < lastCol; c++) {
-                    Cell cell = row.getCell(c);
-                    data[r - 1][c] = getCellValue(cell);
+            
+            // Bắt đầu từ row 1 (bỏ qua header row 0)
+            for (int i = 1; i <= sheet.getLastRowNum(); i++) {
+                Row row = sheet.getRow(i);
+                if (row == null) continue;
+                
+                // Đảm bảo mỗi row có ĐÚNG 4 cột
+                Object[] rowData = new Object[4];
+                
+                for (int j = 0; j < 4; j++) {
+                    Cell cell = row.getCell(j);
+                    if (cell != null) {
+                        cell.setCellType(CellType.STRING); // Force đọc là String
+                        rowData[j] = cell.getStringCellValue().trim(); // Trim khoảng trắng thừa
+                    } else {
+                        rowData[j] = ""; // Giá trị mặc định nếu cell trống
+                    }
                 }
+                
+                dataList.add(rowData);
             }
-
-            System.out.println("[ExcelReader] ✅ Đọc sheet '" + sheetName
-                    + "': " + lastRow + " dòng data");
-            return data;
-
+            
         } catch (IOException e) {
-            throw new RuntimeException("❌ Lỗi đọc file Excel: " + filePath, e);
+            System.err.println("Lỗi đọc file Excel: " + filePath);
+            e.printStackTrace();
+            return new Object[0][4];
         }
+        
+        // Chuyển List<Object[]> sang Object[][] cho TestNG
+        return dataList.toArray(new Object[0][]);
     }
-
+    
     /**
-     * Xử lý từng kiểu dữ liệu trong cell.
-     * Cell null → trả về "" thay vì NullPointerException.
+     * Utility: Đếm số row data trong sheet (không tính header)
      */
-    private static String getCellValue(Cell cell) {
-        if (cell == null) return ""; // Cell rỗng → chuỗi rỗng
-
-        return switch (cell.getCellType()) {
-            case STRING  -> cell.getStringCellValue().trim();
-            case NUMERIC -> String.valueOf((long) cell.getNumericCellValue());
-            case BOOLEAN -> String.valueOf(cell.getBooleanCellValue());
-            case FORMULA ->
-                // Với cell chứa công thức → lấy kết quả đã tính sẵn
-                    cell.getCachedFormulaResultType() == CellType.NUMERIC
-                            ? String.valueOf((long) cell.getNumericCellValue())
-                            : cell.getStringCellValue().trim();
-            default -> ""; // BLANK, ERROR, _NONE → chuỗi rỗng
-        };
+    public static int getRowCount(String filePath, String sheetName) {
+        try (FileInputStream fis = new FileInputStream(filePath);
+             Workbook workbook = new XSSFWorkbook(fis)) {
+            
+            Sheet sheet = workbook.getSheet(sheetName);
+            return sheet != null ? sheet.getLastRowNum() : 0;
+            
+        } catch (IOException e) {
+            e.printStackTrace();
+            return 0;
+        }
     }
 }
