@@ -1,5 +1,6 @@
 package tests;
 import framework.base.BaseTest;
+import framework.config.ConfigReader;
 import framework.pages.CartPage;
 import framework.pages.CheckoutPage;
 import framework.pages.LoginPage;
@@ -9,8 +10,13 @@ import org.testng.annotations.Test;
 import java.util.Map;
 
 public class CheckoutTest extends BaseTest {
+    
     @Test(description = "Checkout với dữ liệu ngẫu nhiên từ Faker - lần 1")
     public void testCheckoutWithFakerData() {
+        // ✅ Đọc credential từ ConfigReader
+        String username = ConfigReader.getInstance().getUsername();
+        String password = ConfigReader.getInstance().getPassword();
+        
         // Sinh dữ liệu ngẫu nhiên — mỗi lần chạy sẽ khác
         Map<String, String> checkoutData = TestDataFactory.randomCheckoutData();
 
@@ -20,7 +26,7 @@ public class CheckoutTest extends BaseTest {
         System.out.println("    Postal Code: " + checkoutData.get("postalCode"));
 
         CartPage cartPage = new LoginPage(getDriver())
-                .login("standard_user", "secret_sauce")
+                .login(username, password)  // ✅ Dùng ConfigReader thay vì hardcode
                 .addFirstItemToCart()
                 .goToCart();
 
@@ -43,6 +49,9 @@ public class CheckoutTest extends BaseTest {
 
     @Test(description = "Chạy lần 2 - dữ liệu Faker khác lần 1")
     public void testCheckoutWithFakerDataRun2() {
+        String username = ConfigReader.getInstance().getUsername();
+        String password = ConfigReader.getInstance().getPassword();
+        
         // Gọi lại y hệt — dữ liệu sẽ khác hoàn toàn
         Map<String, String> checkoutData = TestDataFactory.randomCheckoutData();
 
@@ -52,7 +61,7 @@ public class CheckoutTest extends BaseTest {
         System.out.println("    Postal Code: " + checkoutData.get("postalCode"));
 
         CartPage cartPage = new LoginPage(getDriver())
-                .login("standard_user", "secret_sauce")
+                .login(username, password)  // ✅ Dùng ConfigReader
                 .addFirstItemToCart()
                 .goToCart();
 
