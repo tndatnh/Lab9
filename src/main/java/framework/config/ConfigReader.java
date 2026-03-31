@@ -5,60 +5,72 @@ import java.io.IOException;
 import java.util.Properties;
 
 public class ConfigReader {
+    private static ConfigReader instance;
+    private Properties properties;
+    private static final String CONFIG_PATH = "src/main/resources/config.properties";
 
-    private static final Properties props = new Properties();
-    private static ConfigReader instance; // Singleton: chỉ có 1 instance
-
-    // Constructor private: không ai new ConfigReader() từ bên ngoài được
     private ConfigReader() {
-        // Đọc biến env từ System, mặc định là "dev" nếu không truyền vào
-        String env = System.getProperty("env", "dev");
-        String filePath = "src/test/resources/config-" + env + ".properties";
-
-        try (FileInputStream fis = new FileInputStream(filePath)) {
-            props.load(fis);
-            System.out.println("[ConfigReader] ✅ Đang dùng môi trường: " + env);
-            System.out.println("[ConfigReader] Base URL: " + props.getProperty("base.url"));
-            System.out.println("[ConfigReader] Explicit Wait: " + props.getProperty("explicit.wait") + "s");
-        } catch (IOException e) {
-            throw new RuntimeException("❌ Không tìm thấy file config: " + filePath, e);
-        }
+        properties = new Properties();
+        loadConfig();
     }
 
-    // Gọi method này để lấy instance — tạo mới nếu chưa có
-    public static ConfigReader getInstance() {
+    public static synchronized ConfigReader getInstance() {
         if (instance == null) {
             instance = new ConfigReader();
         }
         return instance;
     }
 
-    // Reset instance — dùng khi test cần đổi env giữa các lần chạy
     public static void reset() {
         instance = null;
     }
 
+    private void loadConfig() {
+        try (FileInputStream fis = new FileInputStream(CONFIG_PATH)) {
+            properties.load(fis);
+        } catch (IOException e) {
+            System.err.println("Không tìm thấy file config: " + CONFIG_PATH);
+        }
+    }
+
+    public String getProperty(String key) {
+        // ✅ ƯU TIÊN: Đọc từ biến môi trường (khi chạy trên CI/CD)
+        String envValue = System.getenv(key.toUpperCase().replace(".", "_"));
+        if (envValue != null && !envValue.isBlank()) {
+            return envValue;
+        }
+        
+        // ✅ FALLBACK: Đọc từ file config (khi chạy local)
+        return properties.getProperty(key);
+    }
+
     public String getBaseUrl() {
-        return props.getProperty("base.url");
+        return getProperty("app.base.url");
     }
 
-    public String getBrowser() {
-        return props.getProperty("browser", "chrome");
+    public String getUsername() {
+        // ✅ Đọc username: ưu tiên env var, fallback về config
+        String username = System.getenv("APP_USERNAME");
+        if (username != null && !username.isBlank()) {
+            return username;
+        }
+        return getProperty("app.username");
     }
 
-    public int getExplicitWait() {
-        return Integer.parseInt(props.getProperty("explicit.wait", "15"));
+    public String getPassword() {
+        // ✅ Đọc password: ưu tiên env var, fallback về config
+        String password = System.getenv("APP_PASSWORD");
+        if (password != null && !password.isBlank()) {
+            return password;
+        }
+        return getProperty("app.password");
     }
 
-    public int getImplicitWait() {
-        return Integer.parseInt(props.getProperty("implicit.wait", "5"));
-    }
-
-    public int getRetryCount() {
-        return Integer.parseInt(props.getProperty("retry.count", "1"));
+    public long getImplicitWait() {
+        return Long.parseLong(getProperty("app.implicit.wait"));
     }
 
     public String getScreenshotPath() {
-        return props.getProperty("screenshot.path", "target/screenshots/");
+        return getProperty("app.screenshot.path");
     }
 }
