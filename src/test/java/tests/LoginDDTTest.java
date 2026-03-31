@@ -1,5 +1,4 @@
 package tests;
-
 import framework.base.BaseTest;
 import framework.pages.InventoryPage;
 import framework.pages.LoginPage;
@@ -9,7 +8,6 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 public class LoginDDTTest extends BaseTest {
-
     // Đường dẫn tới file Excel — dùng chung cho tất cả DataProvider
     private static final String EXCEL_PATH =
             "src/test/resources/testdata/login_data.xlsx";
@@ -40,7 +38,7 @@ public class LoginDDTTest extends BaseTest {
 
     @Test(
             dataProvider = "smokeData",
-            groups = {"smoke", "regression"},
+            groups = { "smoke", "regression" },
             description = "Smoke: đăng nhập thành công"
     )
     public void testLoginSuccess(String username, String password,
@@ -67,7 +65,7 @@ public class LoginDDTTest extends BaseTest {
 
     @Test(
             dataProvider = "negativeData",
-            groups = {"regression"},
+            groups = { "regression" },
             description = "Negative: đăng nhập thất bại"
     )
     public void testLoginFailure(String username, String password,
@@ -84,8 +82,8 @@ public class LoginDDTTest extends BaseTest {
         Assert.assertTrue(
                 result.getErrorMessage().contains(expectedError),
                 "[FAIL] " + description
-                        + "\n  Mong đợi: " + expectedError
-                        + "\n  Thực tế : " + result.getErrorMessage()
+                        + "\nMong đợi: " + expectedError
+                        + "\nThực tế: " + result.getErrorMessage()
         );
     }
 
@@ -96,7 +94,7 @@ public class LoginDDTTest extends BaseTest {
 
     @Test(
             dataProvider = "boundaryData",
-            groups = {"regression"},
+            groups = { "regression" },
             description = "Boundary: dữ liệu biên và injection"
     )
     public void testLoginBoundary(String username, String password,
@@ -113,8 +111,8 @@ public class LoginDDTTest extends BaseTest {
         Assert.assertTrue(
                 result.getErrorMessage().contains(expectedError),
                 "[FAIL] " + description
-                        + "\n  Mong đợi: " + expectedError
-                        + "\n  Thực tế : " + result.getErrorMessage()
+                        + "\nMong đợi: " + expectedError
+                        + "\nThực tế: " + result.getErrorMessage()
         );
     }
 }

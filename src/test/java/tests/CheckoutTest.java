@@ -1,5 +1,4 @@
 package tests;
-
 import framework.base.BaseTest;
 import framework.pages.CartPage;
 import framework.pages.CheckoutPage;
@@ -10,7 +9,6 @@ import org.testng.annotations.Test;
 import java.util.Map;
 
 public class CheckoutTest extends BaseTest {
-
     @Test(description = "Checkout với dữ liệu ngẫu nhiên từ Faker - lần 1")
     public void testCheckoutWithFakerData() {
         // Sinh dữ liệu ngẫu nhiên — mỗi lần chạy sẽ khác

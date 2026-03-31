@@ -1,5 +1,4 @@
 package tests;
-
 import framework.base.BaseTest;
 import framework.pages.InventoryPage;
 import framework.pages.LoginPage;
@@ -7,7 +6,6 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class LoginTest extends BaseTest {
-
     @Test(description = "Đăng nhập thành công với tài khoản hợp lệ")
     public void testLoginSuccess() {
         LoginPage loginPage = new LoginPage(getDriver());

@@ -1,5 +1,4 @@
 package tests;
-
 import framework.base.BaseTest;
 import framework.pages.InventoryPage;
 import framework.pages.LoginPage;
@@ -8,12 +7,10 @@ import framework.utils.UserData;
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
-
 import java.io.IOException;
 import java.util.List;
 
 public class UserLoginTest extends BaseTest {
-
     /**
      * @DataProvider: TestNG sẽ gọi method này để lấy dữ liệu
      * Mỗi Object[] trong mảng = 1 lần chạy test
