@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="Smoke Suite" verbose="1">
+
+    <listeners>
+        <listener class-name="framework.utils.RetryListener"/>
+    </listeners>
+
+    <parameter name="browser" value="chrome"/>
+    <parameter name="env" value="dev"/>
+
+    <test name="Smoke Login Tests">
+        <groups>
+            <run>
+                <!-- Chỉ chạy group "smoke" → chỉ đọc SmokeCases sheet -->
+                <include name="smoke"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="tests.LoginDDTTest"/>
+        </classes>
+    </test>
+
+</suite>

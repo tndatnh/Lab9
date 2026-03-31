@@ -1,0 +1,37 @@
+[
+  {
+    "username": "standard_user",
+    "password": "secret_sauce",
+    "role": "user",
+    "expectSuccess": true,
+    "description": "Tài khoản bình thường - đăng nhập thành công"
+  },
+  {
+    "username": "locked_out_user",
+    "password": "secret_sauce",
+    "role": "user",
+    "expectSuccess": false,
+    "description": "Tài khoản bị khoá - phải thất bại"
+  },
+  {
+    "username": "problem_user",
+    "password": "secret_sauce",
+    "role": "user",
+    "expectSuccess": true,
+    "description": "Tài khoản có vấn đề giao diện - vẫn đăng nhập được"
+  },
+  {
+    "username": "",
+    "password": "secret_sauce",
+    "role": "user",
+    "expectSuccess": false,
+    "description": "Username rỗng - phải thất bại"
+  },
+  {
+    "username": "standard_user",
+    "password": "wrongpass",
+    "role": "user",
+    "expectSuccess": false,
+    "description": "Sai mật khẩu - phải thất bại"
+  }
+]
